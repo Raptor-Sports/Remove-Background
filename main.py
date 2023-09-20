@@ -1,10 +1,27 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
 from rembg import remove
 from PIL import Image
 
 app = FastAPI()
+
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://raptorsports.co",
+    "https://raptor-web.vercel.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post('/removeBackground')
