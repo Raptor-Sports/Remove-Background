@@ -1,9 +1,11 @@
 from fastapi import FastAPI, UploadFile, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from io import BytesIO
 from rembg import remove
 from PIL import Image
+import base64
+import uvicorn
 
 app = FastAPI()
 
@@ -42,6 +44,13 @@ async def remove_background(image: UploadFile):
             output_image.save(output_image_bytes, format="PNG")
             output_image_bytes.seek(0)
 
-            return StreamingResponse(output_image_bytes, media_type='image/png')
+            byteArray = output_image_bytes.getvalue()
+            base64String = base64.b64encode(byteArray).decode('utf-8')
+
+            return JSONResponse(status_code=200, content={"image": base64String})
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=4000)
